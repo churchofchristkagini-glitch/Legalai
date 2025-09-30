@@ -1,0 +1,107 @@
+Build a full-stack SaaS app called NaijaLaw AI Chat using React (Vite + Tailwind + Framer Motion) for the frontend, Supabase for backend/auth/database, and integrate with OpenAI API for AI responses.
+
+Core Features (MVP - Free Tier):
+
+Claude-like chat UI with chat sessions & memory.
+
+Supabase Auth with role-based access (free, pro, enterprise, admin).
+
+RAG pipeline:
+
+Ingest/upload Nigerian legal documents (PDF, DOCX).
+
+Parse → chunk → embed → store in Supabase.
+
+Retrieval on query → AI answer → show citations (with clickable case metadata).
+
+Admin dashboard: CRUD for users, subscription plans, documents, and system messages.
+
+Paystack integration with split payments: subscription checkout, webhook handling, recurring billing, and revenue sharing.
+
+Basic user memory: preferences, last chats, practice areas.
+
+Pro Tier Features:
+
+Real Internet Search (integrate Bing/SerpAPI/Tavily → merge with RAG results).
+
+Legal Citation Generator (Nigerian case law citation style).
+
+Case Summarizer & Headnote Generator (facts, issues, holding, ratio vs obiter).
+
+Search by Principle/Ratio Decidendi.
+
+Case Brief Generator (auto case briefs).
+
+Compare Cases (side-by-side comparison).
+
+Statute Navigator (laws, sections, amendments, cross-references).
+
+Export & Collaboration: save chats, export to PDF/DOCX, team research boards.
+
+Enterprise Tier Features:
+
+Precedent Finder & Timeline (track how principles evolve, overruled cases).
+
+Statute Evolution Tracker.
+
+Team collaboration with role-based permissions & shared folders.
+
+AI Drafting Assistant (motions, affidavits, arguments).
+
+Offline Mode (PWA) with cached cases.
+
+Voice-to-Law (speech input in English + Nigerian Pidgin).
+
+Firm Analytics Dashboard (usage reports, research trends).
+
+White-label option (custom hosting for firms/universities).
+
+Database (Supabase):
+
+users (id, name, email, password, role, subscription_id, memory JSON).
+
+plans (id, name, tier: free/pro/enterprise, features JSON, price, split_account).
+
+subscriptions (id, user_id, plan_id, status, start_date, end_date, paystack_ref).
+
+transactions (id, user_id, amount, plan_id, paystack_tx_ref, split_info).
+
+documents (id, title, type, file_url, embeddings).
+
+chats (id, user_id, session_id, message, role, sources).
+
+admin_notifications (id, message, target_roles, created_at).
+
+UI / UX:
+
+Modern clean look like Claude AI (centered chat, floating input box, citation cards).
+
+Sidebar: chats, saved briefs, statutes.
+
+Dashboard: usage stats, subscription status.
+
+Mobile-first, responsive with Tailwind.
+
+Extra Notes:
+
+Use PSR-4 structure for PHP backend (if needed).
+
+Secure API keys with .env.
+
+Make feature access controlled by subscription tier.
+
+Create seed scripts:
+
+Seed plans (Free, Pro, Enterprise).
+
+Seed admin user.
+
+Add Supabase edge functions for:
+
+RAG ingestion pipeline.
+
+Paystack webhook handling.
+
+Internet search proxy.
+
+Include placeholders for Enterprise-only modules (to be built later).
