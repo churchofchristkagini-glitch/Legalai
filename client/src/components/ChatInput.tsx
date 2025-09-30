@@ -5,13 +5,15 @@ import { useState } from "react";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
+  disabled?: boolean;
+  placeholder?: string;
 }
 
-export function ChatInput({ onSend }: ChatInputProps) {
+export function ChatInput({ onSend, disabled = false, placeholder }: ChatInputProps) {
   const [message, setMessage] = useState("");
 
   const handleSend = () => {
-    if (message.trim()) {
+    if (message.trim() && !disabled) {
       onSend(message);
       setMessage("");
     }
@@ -41,8 +43,9 @@ export function ChatInput({ onSend }: ChatInputProps) {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about Nigerian case law, statutes, or legal principles..."
+            placeholder={placeholder || "Ask about Nigerian case law, statutes, or legal principles..."}
             className="resize-none border-0 focus-visible:ring-0 min-h-[48px] max-h-[200px]"
+            disabled={disabled}
             data-testid="input-chat"
           />
           
@@ -57,7 +60,7 @@ export function ChatInput({ onSend }: ChatInputProps) {
             <Button
               size="icon"
               onClick={handleSend}
-              disabled={!message.trim()}
+              disabled={!message.trim() || disabled}
               data-testid="button-send"
             >
               <Send className="h-5 w-5" />
