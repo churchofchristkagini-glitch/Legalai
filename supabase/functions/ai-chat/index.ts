@@ -121,13 +121,50 @@ async function generateEmbedding(text: string, apiKey: string): Promise<number[]
 }
 
 async function performVectorSearch(supabase: any, queryEmbedding: number[]): Promise<DocumentChunk[]> {
-  // Convert embedding array to string format for PostgreSQL
-  const embeddingString = `[${queryEmbedding.join(',')}]`
+  const { data, error } = await supabase.rpc('match_document_chunks', {
+    query_embedding: queryEmbedding,
+    match_threshold: 0.78, // Adjust this value based on your needs for relevance
+    match_count: 5, // Number of top relevant chunks to retrieve
+  });
 
-  // For now, fallback to text search since vector search function may not be set up yet
-  // TODO: Implement proper vector search once pgvector extension and RPC function are configured
-  return await performTextSearch(supabase, queryEmbedding)
+  if (error) {
+    console.error('Vector search error:', error);
+    return [];
+  }
+
+  // Fetch full document details for citations if needed
+  const documentIds = [...new Set(data.map((chunk: any) => chunk.document_id))];
+  const { data: documentsData, error: documentsError } = await supabase
+    .from('documents')
+    .select('id, title, type, metadata')
+    .in('id', documentIds);
+
+  if (documentsError) {
+    console.error('Error fetching document details:', documentsError);
+    // Continue with chunks even if document details fail
+  }
+
+  const documentsMap = new Map(documentsData?.map((doc: any) => [doc.id, doc]));
+
+  return data.map((chunk: any) => {
+    const document = documentsMap.get(chunk.document_id);
+    return {
+      id: chunk.id,
+      content: chunk.content,
+      metadata: {
+        ...chunk.metadata,
+        case_name: document?.title,
+        year: document?.metadata?.year, // Assuming year is in document metadata
+        court: document?.metadata?.court, // Assuming court is in document metadata
+        document_type: document?.type,
+      },
+      document_id: chunk.document_id,
+    };
+  });
 }
+
+// Remove the performTextSearch function as it's no longer needed.
+
 
 async function performTextSearch(supabase: any, queryEmbedding: number[]): Promise<DocumentChunk[]> {
   // Fallback text search when vector search is not available
