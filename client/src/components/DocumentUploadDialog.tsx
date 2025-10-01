@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, UploadCloud } from 'lucide-react';
+import { Loader as Loader2, CloudUpload as UploadCloud } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments';
 
 interface DocumentUploadDialogProps {
