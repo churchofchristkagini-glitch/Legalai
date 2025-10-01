@@ -106,7 +106,7 @@ export default function Dashboard() {
                     title={doc.title}
                     type={doc.type.toUpperCase()}
                     uploadDate={new Date(doc.created_at).toLocaleDateString()}
-                    size={doc.file_size ? `${(doc.file_size / 1024).toFixed(1)} KB` : 'N/A'}
+                    size={doc.file_size ? \`${(doc.file_size / 1024).toFixed(1)} KB` : 'N/A'}
                   />
                 ))
               )}
