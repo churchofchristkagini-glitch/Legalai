@@ -1,11 +1,41 @@
+```typescript
+import { useState } from "react"; // Import useState
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { StatCard } from "@/components/StatCard";
 import { DocumentCard } from "@/components/DocumentCard";
 import { SubscriptionStatus } from "@/components/SubscriptionStatus";
 import { Button } from "@/components/ui/button";
 import { Scale, Search, FileText, Clock, Upload } from "lucide-react";
+import { DocumentUploadDialog } from "@/components/DocumentUploadDialog"; // Import the new dialog
+import { useDocuments } from "@/hooks/useDocuments"; // Import the new hook
+import { useAuth } from "@/hooks/useAuth"; // Import useAuth to check if user is logged in
+import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton for loading states
 
 export default function Dashboard() {
+  const { user, loading: authLoading } = useAuth(); // Get user and auth loading state
+  const { documents, loading: documentsLoading } = useDocuments(); // Use the new hook
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false); // State for dialog visibility
+
+  if (authLoading || documentsLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Skeleton className="h-8 w-8 rounded-full mx-auto mb-4" />
+          <Skeleton className="h-4 w-32 mx-auto" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    // Redirect to login or show a message if not authenticated
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Please log in to view your dashboard.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b">
@@ -40,7 +70,7 @@ export default function Dashboard() {
           />
           <StatCard
             title="Documents"
-            value="48"
+            value={documents.length.toString()} // Display actual document count
             icon={FileText}
             trend={{ value: 5, isPositive: true }}
           />
@@ -62,35 +92,24 @@ export default function Dashboard() {
           <div className="lg:col-span-2">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">Recent Documents</h2>
-              <Button variant="outline" className="gap-2" data-testid="button-upload">
+              <Button variant="outline" className="gap-2" onClick={() => setIsUploadDialogOpen(true)} data-testid="button-upload">
                 <Upload className="h-4 w-4" /> Upload
               </Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <DocumentCard
-                title="Constitution of Nigeria 1999"
-                type="PDF"
-                uploadDate="Jan 15, 2024"
-                size="2.4 MB"
-              />
-              <DocumentCard
-                title="Evidence Act 2011"
-                type="PDF"
-                uploadDate="Jan 12, 2024"
-                size="1.8 MB"
-              />
-              <DocumentCard
-                title="Criminal Procedure Act"
-                type="DOCX"
-                uploadDate="Jan 10, 2024"
-                size="956 KB"
-              />
-              <DocumentCard
-                title="Companies Act 2020"
-                type="PDF"
-                uploadDate="Jan 8, 2024"
-                size="3.2 MB"
-              />
+              {documents.length === 0 ? (
+                <p className="text-muted-foreground col-span-full">No documents uploaded yet. Click "Upload" to add one.</p>
+              ) : (
+                documents.map((doc) => (
+                  <DocumentCard
+                    key={doc.id}
+                    title={doc.title}
+                    type={doc.type.toUpperCase()}
+                    uploadDate={new Date(doc.created_at).toLocaleDateString()}
+                    size={doc.file_size ? `${(doc.file_size / 1024).toFixed(1)} KB` : 'N/A'}
+                  />
+                ))
+              )}
             </div>
           </div>
 
@@ -106,6 +125,12 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
+
+      <DocumentUploadDialog
+        isOpen={isUploadDialogOpen}
+        onClose={() => setIsUploadDialogOpen(false)}
+      />
     </div>
   );
 }
+```
