@@ -156,6 +156,15 @@ export function useChat() {
       // Call AI service (mock for now)
       const aiResponse = await generateAIResponse(content, currentSession.id, user.id)
 
+      // Check if there was an error with the AI response
+      if (aiResponse.error) {
+        toast({
+          title: "AI Response Error",
+          description: aiResponse.error,
+          variant: "destructive",
+        })
+      }
+
       // Add AI response to database
       const { data: aiMessage, error: aiError } = await supabase
         .from('chats')
@@ -185,6 +194,11 @@ export function useChat() {
 
     } catch (error) {
       console.error('Error sending message:', error)
+      toast({
+        title: "Failed to send message",
+        description: error instanceof Error ? error.message : 'An unexpected error occurred',
+        variant: "destructive",
+      })
     } finally {
       setSending(false)
     }
@@ -271,7 +285,22 @@ async function generateAIResponse(userMessage: string, sessionId: string, userId
     });
 
     if (!response.ok) {
-      throw new Error(`AI service error: ${response.statusText}`);
+      let errorMessage = `AI service error: ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        if (errorData.error) {
+          errorMessage = errorData.error;
+        }
+      } catch (parseError) {
+        // If we can't parse the error response, use the status text
+        console.error('Could not parse error response:', parseError);
+      }
+      return {
+        content: "I apologize, but I couldn't process your request at this time.",
+        sources: [],
+        metadata: { error: true },
+        error: errorMessage
+      };
     }
 
     const data = await response.json();
@@ -289,6 +318,7 @@ async function generateAIResponse(userMessage: string, sessionId: string, userId
       content: "I apologize, but I'm experiencing technical difficulties. Please try again later, or contact support if the problem persists.",
       sources: [],
       metadata: { error: true }
+      error: error instanceof Error ? error.message : 'Unknown error occurred'
     };
   }
 }
