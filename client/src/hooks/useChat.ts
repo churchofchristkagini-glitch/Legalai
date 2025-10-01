@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from './useAuth'
+import { useToast } from './use-toast'
 
 export interface ChatMessage {
   id: string
@@ -25,6 +26,7 @@ export interface ChatSession {
 
 export function useChat() {
   const { user } = useAuth()
+  const { toast } = useToast()
   const [sessions, setSessions] = useState<ChatSession[]>([])
   const [currentSession, setCurrentSession] = useState<ChatSession | null>(null)
   const [messages, setMessages] = useState<ChatMessage[]>([])
@@ -206,8 +208,18 @@ export function useChat() {
 
     if (error) {
       console.error('Error deleting session:', error)
+      toast({
+        title: "Failed to delete chat session",
+        description: error.message,
+        variant: "destructive",
+      })
       return
     }
+
+    toast({
+      title: "Chat session deleted",
+      description: "The chat session has been successfully deleted.",
+    })
 
     setSessions(prev => prev.filter(s => s.id !== sessionId))
     
@@ -215,7 +227,7 @@ export function useChat() {
       setCurrentSession(null)
       setMessages([])
     }
-  }, [user, currentSession])
+  }, [user, currentSession, toast])
 
   // Load sessions on mount
   useEffect(() => {
