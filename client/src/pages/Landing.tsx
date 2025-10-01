@@ -3,6 +3,7 @@ import { FeatureCard } from "@/components/FeatureCard";
 import { PricingCard } from "@/components/PricingCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
 import { 
   Search, 
   Brain, 
@@ -16,6 +17,16 @@ import {
 } from "lucide-react";
 
 export default function Landing() {
+  const [, setLocation] = useLocation();
+
+  const handleLogin = () => {
+    setLocation('/chat');
+  };
+
+  const handleSignup = () => {
+    setLocation('/chat');
+  };
+
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b">
@@ -26,10 +37,10 @@ export default function Landing() {
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle />
-            <Button variant="ghost" data-testid="button-login">
+            <Button variant="ghost" onClick={handleLogin} data-testid="button-login">
               Log In
             </Button>
-            <Button data-testid="button-signup">Sign Up</Button>
+            <Button onClick={handleSignup} data-testid="button-signup">Sign Up</Button>
           </div>
         </div>
       </header>

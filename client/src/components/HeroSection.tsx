@@ -1,8 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play } from "lucide-react";
+import { useLocation } from "wouter";
 import heroImage from "@assets/generated_images/Nigerian_Supreme_Court_hero_image_592186bd.png";
 
 export function HeroSection() {
+  const [, setLocation] = useLocation();
+
+  const handleStartFree = () => {
+    setLocation('/chat');
+  };
+
   return (
     <div className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
       <div 
@@ -24,6 +31,7 @@ export function HeroSection() {
           <Button 
             size="lg" 
             className="bg-white text-primary hover:bg-white/90 gap-2"
+            onClick={handleStartFree}
             data-testid="button-start-free"
           >
             Start Free <ArrowRight className="h-5 w-5" />
