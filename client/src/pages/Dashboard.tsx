@@ -1,20 +1,19 @@
-```typescript
-import { useState } from "react"; // Import useState
+import { useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { StatCard } from "@/components/StatCard";
 import { DocumentCard } from "@/components/DocumentCard";
 import { SubscriptionStatus } from "@/components/SubscriptionStatus";
 import { Button } from "@/components/ui/button";
 import { Scale, Search, FileText, Clock, Upload } from "lucide-react";
-import { DocumentUploadDialog } from "@/components/DocumentUploadDialog"; // Import the new dialog
-import { useDocuments } from "@/hooks/useDocuments"; // Import the new hook
-import { useAuth } from "@/hooks/useAuth"; // Import useAuth to check if user is logged in
-import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton for loading states
+import { DocumentUploadDialog } from "@/components/DocumentUploadDialog";
+import { useDocuments } from "@/hooks/useDocuments";
+import { useAuth } from "@/hooks/useAuth";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Dashboard() {
-  const { user, loading: authLoading } = useAuth(); // Get user and auth loading state
-  const { documents, loading: documentsLoading } = useDocuments(); // Use the new hook
-  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false); // State for dialog visibility
+  const { user, loading: authLoading } = useAuth();
+  const { documents, loading: documentsLoading } = useDocuments();
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
   if (authLoading || documentsLoading) {
     return (
@@ -28,7 +27,6 @@ export default function Dashboard() {
   }
 
   if (!user) {
-    // Redirect to login or show a message if not authenticated
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-muted-foreground">Please log in to view your dashboard.</p>
@@ -70,7 +68,7 @@ export default function Dashboard() {
           />
           <StatCard
             title="Documents"
-            value={documents.length.toString()} // Display actual document count
+            value={documents.length.toString()}
             icon={FileText}
             trend={{ value: 5, isPositive: true }}
           />
@@ -106,7 +104,7 @@ export default function Dashboard() {
                     title={doc.title}
                     type={doc.type.toUpperCase()}
                     uploadDate={new Date(doc.created_at).toLocaleDateString()}
-                    size={doc.file_size ? \`${(doc.file_size / 1024).toFixed(1)} KB` : 'N/A'}
+                    size={doc.file_size ? `${(doc.file_size / 1024).toFixed(1)} KB` : 'N/A'}
                   />
                 ))
               )}
@@ -133,4 +131,3 @@ export default function Dashboard() {
     </div>
   );
 }
-```

@@ -1,4 +1,3 @@
-```typescript
 import { useState, ChangeEvent, FormEvent } from 'react';
 import {
   Dialog,
@@ -150,4 +149,3 @@ export function DocumentUploadDialog({ isOpen, onClose }: DocumentUploadDialogPr
     </Dialog>
   );
 }
-```
