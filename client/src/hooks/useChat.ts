@@ -317,7 +317,7 @@ async function generateAIResponse(userMessage: string, sessionId: string, userId
     return {
       content: "I apologize, but I'm experiencing technical difficulties. Please try again later, or contact support if the problem persists.",
       sources: [],
-      metadata: { error: true }
+      metadata: { error: true },
       error: error instanceof Error ? error.message : 'Unknown error occurred'
     };
   }
