@@ -163,31 +163,6 @@ async function performVectorSearch(supabase: any, queryEmbedding: number[]): Pro
   });
 }
 
-// Remove the performTextSearch function as it's no longer needed.
-
-
-async function performTextSearch(supabase: any, queryEmbedding: number[]): Promise<DocumentChunk[]> {
-  // Fallback text search when vector search is not available
-  const { data, error } = await supabase
-    .from('document_chunks')
-    .select(`
-      id,
-      content,
-      metadata,
-      document_id,
-      documents!inner(title, type, metadata)
-    `)
-    .textSearch('content', 'Nigerian | law | legal | case | court | statute')
-    .limit(5)
-
-  if (error) {
-    console.error('Text search error:', error)
-    return []
-  }
-
-  return data || []
-}
-
 async function generateAIResponse(query: string, chunks: DocumentChunk[], apiKey: string): Promise<string> {
   // Construct context from relevant chunks
   const context = chunks.map((chunk, index) => 
