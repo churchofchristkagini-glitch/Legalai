@@ -152,7 +152,7 @@ export function useChat() {
       }
 
       // Call AI service (mock for now)
-      const aiResponse = await generateAIResponse(content)
+      const aiResponse = await generateAIResponse(content, currentSession.id, user.id)
 
       // Add AI response to database
       const { data: aiMessage, error: aiError } = await supabase
@@ -238,38 +238,45 @@ export function useChat() {
   }
 }
 
-// Mock AI response generator (replace with actual OpenAI integration)
-async function generateAIResponse(userMessage: string) {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000))
+// AI response generator using Supabase Edge Function
+async function generateAIResponse(userMessage: string, sessionId: string, userId: string) {
+  try {
+    const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`;
+    
+    const headers = {
+      'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      'Content-Type': 'application/json',
+    };
 
-  const responses = [
-    {
-      content: "I understand your question about Nigerian law. Based on the legal precedents and statutes in our database, here's what I found...",
-      sources: [
-        {
-          caseName: "FRN v. Osahon",
-          year: "2006",
-          court: "Supreme Court"
-        }
-      ]
-    },
-    {
-      content: "This is an interesting legal question. Let me search through the relevant Nigerian cases and statutes to provide you with accurate information...",
-      sources: [
-        {
-          caseName: "Adeyemi v. Lan & Baker (Nig) Ltd",
-          year: "2008",
-          court: "Supreme Court"
-        },
-        {
-          caseName: "Registered Trustees of APC v. INEC",
-          year: "2020",
-          court: "Court of Appeal"
-        }
-      ]
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        query: userMessage,
+        sessionId,
+        userId
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`AI service error: ${response.statusText}`);
     }
-  ]
 
-  return responses[Math.floor(Math.random() * responses.length)]
+    const data = await response.json();
+    
+    return {
+      content: data.content || "I apologize, but I couldn't process your request at this time.",
+      sources: data.sources || [],
+      metadata: data.metadata || {}
+    };
+  } catch (error) {
+    console.error('Error calling AI service:', error);
+    
+    // Fallback response
+    return {
+      content: "I apologize, but I'm experiencing technical difficulties. Please try again later, or contact support if the problem persists.",
+      sources: [],
+      metadata: { error: true }
+    };
+  }
 }
